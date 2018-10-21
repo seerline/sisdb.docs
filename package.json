@@ -1,0 +1,25 @@
+{
+  "name": "stsdb.docs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "docs": "open http://localhost:8080/ && vuepress dev .",
+    "docs:build": "vuepress build .",
+    "docs:deploy": "sh ./deploy.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seerline/stsdb.docs.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/seerline/stsdb.docs/issues"
+  },
+  "homepage": "https://github.com/seerline/stsdb.docs#readme",
+  "devDependencies": {
+    "vuepress": "^1.0.0-alpha.13"
+  }
+}
