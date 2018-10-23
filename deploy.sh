@@ -21,7 +21,7 @@ git commit -m 'deploy'
 # 如果发布到 https://<USERNAME>.github.io
 # git push -f git@github.com:<USERNAME>/<USERNAME>.github.io.git master
 
-# 如果发布到 https://seerline.github.io/stsdb
-git push -f git@github.com:seerline/stsdb.git master:gh-pages
+# 如果发布到 https://seerline.github.io/sisdb
+git push -f git@github.com:seerline/sisdb.git master:gh-pages
 
 rm -rf vuepress

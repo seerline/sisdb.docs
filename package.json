@@ -1,5 +1,5 @@
 {
-  "name": "stsdb.docs",
+  "name": "sisdb.docs",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,15 +10,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/seerline/stsdb.docs.git"
+    "url": "git+https://github.com/seerline/sisdb.docs.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/seerline/stsdb.docs/issues"
+    "url": "https://github.com/seerline/sisdb.docs/issues"
   },
-  "homepage": "https://github.com/seerline/stsdb.docs#readme",
+  "homepage": "https://github.com/seerline/sisdb.docs#readme",
   "devDependencies": {
     "vuepress": "^1.0.0-alpha.13"
   }
