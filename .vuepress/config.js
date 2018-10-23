@@ -73,9 +73,9 @@ module.exports = {
             link: 'https://github.com/seerline/sisdb/blob/master/CHANGELOG.md'
           }
         ],
-        sidebar: {
-          '/zh/guide/': genSidebarConfig('指南')
-        }
+        // sidebar: {
+        //   '/zh/guide/': genSidebarConfig('指南')
+        // }
       }
     }
   }
