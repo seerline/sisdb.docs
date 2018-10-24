@@ -1,15 +1,15 @@
 module.exports = {
   dest: 'vuepress',
-  base: '/stsdb/',
+  base: '/sisdb/',
   locales: {
     '/': {
       lang: 'en-US',
-      title: 'stsdb',
+      title: 'sisdb',
       description: 'High performance timing database'
     },
     '/zh/': {
       lang: 'zh-CN',
-      title: 'stsdb',
+      title: 'sisdb',
       description: '高性能时序数据库'
     }
   },
@@ -27,7 +27,7 @@ module.exports = {
   serviceWorker: true,
   // theme: 'vue',
   themeConfig: {
-    repo: 'seerline/stsdb',
+    repo: 'seerline/sisdb',
     editLinks: true,
     docsDir: 'docs',
     locales: {
@@ -47,7 +47,7 @@ module.exports = {
           },
           {
             text: 'Changelog',
-            link: 'https://github.com/seerline/stsdb/blob/master/CHANGELOG.md'
+            link: 'https://github.com/seerline/sisdb/blob/master/CHANGELOG.md'
           }
         ],
         sidebar: {
@@ -70,12 +70,12 @@ module.exports = {
           },
           {
             text: 'Changelog',
-            link: 'https://github.com/seerline/stsdb/blob/master/CHANGELOG.md'
+            link: 'https://github.com/seerline/sisdb/blob/master/CHANGELOG.md'
           }
         ],
-        sidebar: {
-          '/zh/guide/': genSidebarConfig('指南')
-        }
+        // sidebar: {
+        //   '/zh/guide/': genSidebarConfig('指南')
+        // }
       }
     }
   }

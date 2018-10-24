@@ -8,12 +8,12 @@ features:
   details: High performance timing database.
 - title: Simple
   details: Simple to use.
-footer: MIT Licensed | Copyright © 2018-present stsdb
+footer: MIT Licensed | Copyright © 2018-present sisdb
 ---
 
-# Install stsdb
+# Install sisdb
 
 ## Manual Download
 
-You can download the latest version of `stsdb` from the [GitHub releases](https://github.com/seerline/stsdb/releases/latest)
+You can download the latest version of `sisdb` from the [GitHub releases](https://github.com/seerline/sisdb/releases/latest)
 
