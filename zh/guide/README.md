@@ -50,7 +50,7 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
     2018年12月31日 -- 完成V1.0开发和使用，对接clchart实现前后端证券行情展示
                      该阶段以redis的插件形式存在，仅仅解决数据存取，不包括网络和调度等；
 
-    ![V1.0](https://github.com/seerline/sisdb.docs/blob/master/zh/guide/sisdb1.png)
+    ![V1.0](https://github.com/seerline/sisdb.docs/tree/master/zh/guide/sisdb1.png)
 
     2019年 6月30日 -- 完成V2.0开发和使用，完善数据库性能和功能
                      该阶段支持独立的多通讯协议，远程过程调用等；
