@@ -118,7 +118,7 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
    > 以独立运行模式安装 (暂时不支持)
       
       实质是把网络通讯功能提取为前置机，起到负载均衡，服务调度等功能，后端绑定多个so、python脚本、提供服务连接；
-
+ 
    1、下载并安装sisdb
    ` 
       git clone  https://github.com/seerline/sisdb.git
