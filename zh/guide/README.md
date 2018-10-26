@@ -88,10 +88,16 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
 
    3、配置 redis.conf 并启动
       cd /home/redis
-      在 redis.conf 增加一行
+
+   > 在centos7.0版本配置：
+         在 redis.conf 增加一行
          loadmodule ../sisdb/bin/libsisdb.so ../sisdb/bin/sisdb.conf
 
-      ./src/redis-server
+   > 在 apple 版本配置：
+         在 redis.conf 增加一行
+         loadmodule ../sisdb/bin/libsisdb.dylib ../sisdb/bin/sisdb.conf
+
+      ./src/redis-server redis.conf
 
    4、运行客户端开始体验
 
