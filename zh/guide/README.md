@@ -1,3 +1,6 @@
+---
+sidebar: auto
+---
 
 ## 什么是 sisdb ?
 
@@ -71,33 +74,35 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
 
    1、从以下地址下载并安装redis，对 antirez 的版本做了些微的修改，以适应json格式的请求命令；
 
-   `
-      cd /home
-      git clone  https://github.com/coollyer/redis.git
-   `
+
+   ```shell
+    cd /home
+    git clone  https://github.com/coollyer/redis.git
+   ```
+
    安装redis请参考网上流程，相关的自行安装；
 
    2、下载并安装sisdb
-   ` 
-      git clone  https://github.com/seerline/sisdb.git
-      cd sisdb/src
-      cmake .
-      make
-   `
+
+   ```shell
+    git clone  https://github.com/seerline/sisdb.git
+    cd sisdb/src
+    cmake .
+    make
+   ```
+
    程序安装完成；
 
-   3、配置 redis.conf 并启动
-      cd /home/redis
+   3、配置 redis.conf 并启动 `cd /home/redis`
 
    > 在centos7.0版本配置：
-         在 redis.conf 增加一行
-         loadmodule ../sisdb/bin/libsisdb.so ../sisdb/bin/sisdb.conf
+    在 redis.conf 增加一行
+    `loadmodule ../sisdb/bin/libsisdb.so ../sisdb/bin/sisdb.conf`
 
    > 在 apple 版本配置：
-         在 redis.conf 增加一行
-         loadmodule ../sisdb/bin/libsisdb.dylib ../sisdb/bin/sisdb.conf
+    在 redis.conf 增加一行 `loadmodule ../sisdb/bin/libsisdb.dylib ../sisdb/bin/sisdb.conf`
 
-      ./src/redis-server redis.conf
+    ./src/redis-server redis.conf
 
    4、运行客户端开始体验
 
