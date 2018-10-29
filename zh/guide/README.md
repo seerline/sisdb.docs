@@ -97,10 +97,10 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
 
    > 在centos7.0版本配置：
     在 redis.conf 增加一行
-    `loadmodule ../sisdb/bin/libsisdb.so ../sisdb/bin/sisdb.conf`
+    `loadmodule ../sisdb/bin/libsisdb.so ../sisdb/bin/stock.conf`
 
    > 在 apple 版本配置：
-    在 redis.conf 增加一行 `loadmodule ../sisdb/bin/libsisdb.dylib ../sisdb/bin/sisdb.conf`
+    在 redis.conf 增加一行 `loadmodule ../sisdb/bin/libsisdb.dylib ../sisdb/bin/stock.conf`
 
     ./src/redis-server redis.conf
 
@@ -108,7 +108,7 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
 
       ./src/redis-cli 
 
-      > sisdb.list      
+      > stock.list      
       --- 列出所有数据表, 系统默认会有一个stock的数据集合
       --- 用户也可以自行增加不同类别的数据集合，但数据集合名字不能相同，数据表名可重复
 
@@ -160,7 +160,7 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
    
    cd cs/bin
 
-   ./cs-server sisdb.conf
+   ./cs-server sisdb.server.conf
 
    -- server默认打开127.0.0.1:20329 端口用于TCP通讯端口; 
    
@@ -175,7 +175,7 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
     >backup ...
     --- 备份当前数据库到指定目录
 
-    >sisdb.list
+    >stock.list
     --- 列出所有数据表 
    
 --------------------
@@ -183,9 +183,9 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
 ## 指令集
 
 
-> sisdb.list 
+> [db].list 
    
-   列出所有数据表
+   列出[db]数据集合中的所有数据表
 
 > [db].get [key].day [command]
 
@@ -249,13 +249,26 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
 
       log - 日志（运行期目录）
 
-   ### 主配置文件  sisdb.conf
+   ### 主配置文件  
+      sisdb.conf   -- 作为通用配置，主要设置路径、内存管理、网络等公共配置，可被其他配置直接引用
       
-      主要配置文件，可加载多个数据库文件，每个数据库的结构在配置文件中设定好，用户对配置文件中定义好的表结构不能更改；
-      但用户可以通过指令自行创建表格和字段进行数据库操作；
+      sisdb.server.conf  -- 作为独立服务时使用的配置文件
+
+      主要配置文件
       详见配置文件中说明
 
-   ### 数据表默认配置文件 sisdb.core.conf
+   ### 数据表（证券）主配置文件  
+
+      stock.conf  -- 定义stock的信息
+
+   ### 数据表（证券）默认配置文件 
+      
+
+      stock.basic.conf  -- 定义stock基础信息
+      stock.table.conf  -- 定义stock数据表
+
+      每个数据库的结构在配置文件中设定好，用户对配置文件中定义好的表结构不能更改；
+      但用户可以通过指令自行创建表格和字段进行数据库操作；
 
       sisdb有两种数据表结构
       1、 json格式数据表
