@@ -86,7 +86,7 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
 
    ```shell
     git clone  https://github.com/seerline/sisdb.git
-    cd sisdb/src
+    cd sisdb/src/sisdb
     cmake .
     make
    ```
