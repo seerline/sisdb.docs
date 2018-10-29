@@ -109,27 +109,28 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
       ./src/redis-cli 
 
       > sisdb.list      
-      --- 列出所有数据表
+      --- 列出所有数据表, 系统默认会有一个stock的数据集合
+      --- 用户也可以自行增加不同类别的数据集合，但数据集合名字不能相同，数据表名可重复
 
-      > sisdb.set sh600999.now json {"time":1530498214,"close":100,"vol":1000}
+      > stock.set sh600999.now json {"time":1530498214,"close":100,"vol":1000}
       --- 向数据库的now表写入一条行情信息, 虽然只写入了一条数据，数据库已经更新了相关的其他数据
       --- 由于tick、min、min5、day这些表订阅了now，因此当now数据更新后，会同时更新订阅了now的其他关联表，因此，此时访问其他表也会有数据；
 
-      > sisdb.get sh600999.tick
+      > stock.get sh600999.tick
       --- 列出sh600999的分笔成交，默认以json格式返回
 
-      > sisdb.get sh600999.min 
+      > stock.get sh600999.min 
       --- 列出sh600999的分钟线数据，未输入字段特殊处理
 
       >> 下面进行带参数的查询
 
-      > sisdb.set sh600999.now json {"time":1530598214,"close":120,"vol":5000}
+      > stock.set sh600999.now json {"time":1530598214,"close":120,"vol":5000}
       --- 再增加一条20180703的数据
 
-      > sisdb.get sh600999.day {"search":{"min":20180702}}    
+      > stock.get sh600999.day {"search":{"min":20180702}}    
       --- 列出 20180702 的日线数据
 
-      > sisdb.get sh600999.day {"fields":"time,close","format":"array","search":{"min":20180702,"count":10}}
+      > stock.get sh600999.day {"fields":"time,close","format":"array","search":{"min":20180702,"count":10}}
       --- 以数组格式列出 20180702 后共10条日线数据，只需要time和close字段
 
       --- 更多参数请阅读后续文档
@@ -186,8 +187,9 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
    
    列出所有数据表
 
-> sisdb.get [key].day [command]
+> [db].get [key].day [command]
 
+   [db]  表示从哪个数据集合分发的指令
    [key] 表示取哪只股票数据
    key== * 表示所有股票数据，
 
@@ -218,8 +220,9 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
    返回数据为: 
     [[]];
 
-> sisdb.set [key].day [format] [data]
+> [db].set [key].day [format] [data]
 
+   [db]  表示从哪个数据集合分发的指令
    [key] 表示取哪只股票数据，必须有明确的代码 如果代码不存在会直接生成一个，并不会报错
 
    [format] 表示传入数据格式
