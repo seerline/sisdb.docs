@@ -6,6 +6,9 @@ sidebar: auto
 
 sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并可数据持久化，专业用于有价证券行情信息的时序数据库；
 
+
+主要应用于多市场行情采集、服务、分析；给最终使用者提供最简单的、高效的方案；
+
 ## 为什么需要 sisdb
 
 > 在现有的数据库中，主流的关系数据库因为吞吐量的原因无法满足高速大量的数据写入，即便是现在最流行的mongodb，当发生随机写入时效率也会大幅度降低；而作为速度最快的内存数据库redis，吞吐量足够，但是其所提供的数据结构却并未针对有价证券体系，和普通的文件存储解决方案相比并没有什么优势；
@@ -80,13 +83,13 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
     git clone  https://github.com/coollyer/redis.git
    ```
 
-   安装redis请参考网上流程，相关的自行安装；
+   安装redis请参考网上流程，相关操作的自行解决安装；
 
    2、下载并安装sisdb
 
    ```shell
     git clone  https://github.com/seerline/sisdb.git
-    cd sisdb/src/sisdb
+    cd sisdb/src/
     cmake .
     make
    ```
@@ -97,40 +100,43 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
 
    > 在centos7.0版本配置：
     在 redis.conf 增加一行
-    `loadmodule ../sisdb/bin/libsisdb.so ../sisdb/bin/stock.conf`
+
+   `loadmodule ../sisdb/bin/libsisdb.so ../sisdb/bin/sisdb.conf`
 
    > 在 apple 版本配置：
-    在 redis.conf 增加一行 `loadmodule ../sisdb/bin/libsisdb.dylib ../sisdb/bin/stock.conf`
+    在 redis.conf 增加一行 
+    
+   `loadmodule ../sisdb/bin/libsisdb.dylib ../sisdb/bin/sisdb.conf`
 
-    ./src/redis-server redis.conf
+   `./src/redis-server redis.conf`
 
    4、运行客户端开始体验
 
       ./src/redis-cli 
+   
+   > sisdb.show      
+      列出所有数据表, 系统默认会有一个sisdb的数据集合
+      用户也可以自行增加不同类别的数据集合，但数据集合名字不能相同，数据表名可重复
 
-      > stock.list      
-      --- 列出所有数据表, 系统默认会有一个stock的数据集合
-      --- 用户也可以自行增加不同类别的数据集合，但数据集合名字不能相同，数据表名可重复
-
-      > stock.set sh600999.now json {"time":1530498214,"close":100,"vol":1000}
+      > sisdb.set sh600999.now {"time":1530498214,"close":100,"vol":1000}
       --- 向数据库的now表写入一条行情信息, 虽然只写入了一条数据，数据库已经更新了相关的其他数据
       --- 由于tick、min、min5、day这些表订阅了now，因此当now数据更新后，会同时更新订阅了now的其他关联表，因此，此时访问其他表也会有数据；
 
-      > stock.get sh600999.tick
+      > sisdb.get sh600999.tick
       --- 列出sh600999的分笔成交，默认以json格式返回
 
-      > stock.get sh600999.min 
+      > sisdb.get sh600999.min 
       --- 列出sh600999的分钟线数据，未输入字段特殊处理
 
       >> 下面进行带参数的查询
 
-      > stock.set sh600999.now json {"time":1530598214,"close":120,"vol":5000}
+      > sisdb.set sh600999.now {"time":1530598214,"close":120,"vol":5000}
       --- 再增加一条20180703的数据
 
-      > stock.get sh600999.day {"search":{"min":20180702}}    
+      > sisdb.get sh600999.day {"search":{"min":20180702}}    
       --- 列出 20180702 的日线数据
 
-      > stock.get sh600999.day {"fields":"time,close","format":"array","search":{"min":20180702,"count":10}}
+      > sisdb.get sh600999.day {"fields":"time,close","format":"array","search":{"min":20180702,"count":10}}
       --- 以数组格式列出 20180702 后共10条日线数据，只需要time和close字段
 
       --- 更多参数请阅读后续文档
@@ -164,8 +170,8 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
 
    -- server默认打开127.0.0.1:20329 端口用于TCP通讯端口; 
    
-   -- 20330 为http端口 20331 为https端口
-   -- 20332 为ws端口   20333 为wss端口
+   -- 20330 为ws端口   20331 为wss端口
+   -- 20332 为http端口 20333 为https端口
 
    运行客户端
    ./cs-client 
@@ -175,7 +181,7 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
     >backup ...
     --- 备份当前数据库到指定目录
 
-    >stock.list
+    >sisdb.show
     --- 列出所有数据表 
    
 --------------------
@@ -183,15 +189,18 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
 ## 指令集
 
 
-> [db].list 
+> [db].show  [key]
    
-   列出[db]数据集合中的所有数据表
+   列出[db]数据集合中的所有数据表和基本信息
+   不带key参数，列出所有表的基本信息
+   如果有key，（例如：SH600600.INFO）那么就会列出当前key中有多少记录
 
 > [db].get [key].day [command]
 
    [db]  表示从哪个数据集合分发的指令
    [key] 表示取哪只股票数据
-   key== * 表示所有股票数据，
+   key == *   表示返回符合条件股票最后一条记录的集合数据，
+   key == **  表示返回符合条件的股票代码列表，
 
    [command] 可有可无，由command定义数据范围和字段范围
 
@@ -211,43 +220,46 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
    字段:     "fields":  "time,close,vol,name" 表示一共4个字段  
                         空---->表示全部字段
    --------<以下区域没有表示全部数据>--------
-   数据范围: "search":   min,max 按时序索引取数据
-   				  count(和max互斥，正表示向后，负表示向前),
+   数据范围: "search":   
+                 min 有min表示按时间来检索  max 按时序索引取数据
+                 start，stop 按记录号取数据 0，-1-->表示全部数据
+   				  count(和max或stop互斥，正表示向后，负表示向前),
    				  force为0表示按实际取，为1若无数据就取min前一个数据，
-   数据范围: "range":    start，stop 按记录号取数据 0，-1-->表示全部数据
-   				  count(和stop互斥，正表示向后，负表示向前),
+   数据范围:  "match" : 按字段匹配
+
 
    返回数据为: 
     [[]];
 
-> [db].set [key].day [format] [data]
+> [db].set [key].day [data]
+   
+   以json格式传输数据 可以是{},也可以是 []
 
    [db]  表示从哪个数据集合分发的指令
-   [key] 表示取哪只股票数据，必须有明确的代码 如果代码不存在会直接生成一个，并不会报错
-
-   [format] 表示传入数据格式
-                  "json" --> STS_DATA_JSON  默认返回json全部数据
-   				   "array" --> STS_DATA_ARRAY 仅仅返回value数组
-   				   "struct" --> STS_DATA_BIN  
-   				   "string" --> STS_DATA_STRING
-   				   "zip" --> STS_DATA_ZIP
-
+   [key] 表示取哪只股票数据，必须有明确的代码 
    [data] 表示跟的数据，
 
+> [db].sset [key].day [data]
+   
+   以二进制格式传输数据 
+
+   [db]  表示从哪个数据集合分发的指令
+   [key] 表示取哪只股票数据，必须有明确的代码 
+   [data] 表示跟的数据，
 
 ## 配置说明
 
-   ### 目录a说明
+   ### 目录说明
 
-     bin - 输出文件、配置文件等
+   bin - 输出文件、配置文件等
 
-      src - 源码
+   src - 源码
 
-      demo - 单元测试
+   test - 单元测试
 
-      db - 默认数据文件存放位置（运行期目录）
+   db - 默认数据文件存放位置（运行期目录）
 
-      log - 日志（运行期目录）
+   log - 日志（运行期目录）
 
    ### 主配置文件  
       sisdb.conf   -- 作为通用配置，主要设置路径、内存管理、网络等公共配置，可被其他配置直接引用
@@ -259,38 +271,30 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
 
    ### 数据表（证券）主配置文件  
 
-      stock.conf  -- 定义stock的信息
+      sisdb.conf  -- 定义sisdb的信息
 
    ### 数据表（证券）默认配置文件 
       
 
-      stock.basic.conf  -- 定义stock基础信息
-      stock.table.conf  -- 定义stock数据表
+      sisdb.fields.conf  -- 定义sisdb数据表信息
+      sisdb.values.conf  -- 定义sisdb缺省数据
 
-      每个数据库的结构在配置文件中设定好，用户对配置文件中定义好的表结构不能更改；
+      每个数据库的结构在配置文件中设定好，用户对配置文件中定义好的表结构在当前版本中不能更改；
       但用户可以通过指令自行创建表格和字段进行数据库操作；
 
-      sisdb有两种数据表结构
-      1、 json格式数据表
-         主要用于初始化数据和不定字段的数据表存储；
-         json格式数据表任何时候存储都是以json格式保存，因此一般用于存储数量量不大，字段不固定的信息类数据；
-
-      2、 结构化格式数据表
+      sisdb只有一种数据表结构
+      1、结构化格式数据表
          主要用于结构固定，数值型数据的存储； 
 
    > 首先创建一个市场的基础数据表
       数据以散列hash表方式存储，数据结构如下：
       
-      key --> tables --> data ;
-
-      主要有以下几种key值；
-      
-      市场编号 -- 仅有且必须有一个market表；（json格式）
+      市场编号 -- 仅有且必须有一个 exch 表；
                  储存该市场的基础信息和配置，比如开收市时间，时区，市场名称等，这些信息通常在初始化时存入；
 
       例子：SH  (市场号不区分大小写)
 
-         market表中必要字段：
+         exch 表中必要字段：
 
          1、 trade-time --交易时间段  [[930,1130],[1300,1500]]
 
@@ -303,12 +307,13 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
 
          5、status  --  状态，0 初始化等待 1 正常运行 3 收市
       
+   > 创建一个证券信息的数据表
 
-      市场编号 + 股票代码 -- 必须有至少一个stock表（json格式）；存储一个股票的信息，保存该股票的特定信息；
+      市场编号 + 股票代码 -- 必须有至少一个 info 表；存储一个股票的信息，保存该股票的特定信息；
       
       例子：sh600999
 
-      stock表中必要字段：
+      sisdb表中必要字段：
 
       1、market -- 市场号 虽然系统默认前两位为市场号，但并不排除后期有3位的市场号，因此每个代码隶属哪个市场必须要指明
 
@@ -318,11 +323,11 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
 
       4、search -- 检索串
 
-      5、price-unit   -- 价格单位   默认为 100 
+      5、prc-unit   -- 价格单位   默认为 100 
          定义为 price 的字段必须对传入的值放大后取整写入，输出时再缩小以 float 输出；
 
-      6、volume-unit -- 成交量单位  默认为 100
-         定义为volume的字段必须对传入的值缩小后写入，输出时再放大以uint输出；
+      6、vol-unit -- 成交量单位  默认为 100
+         定义为volume 的字段必须对传入的值缩小后写入，输出时再放大以uint输出；
       
       7、type -- 股票类型
 
@@ -330,37 +335,11 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
 
       ---------
 
-      配置文件会设定默认的JSON，如果客户没有输入对应信息，就自动价值默认市场和股票的配置；
-
-      其他字段可自行增补；
-
    > 每个股票的结构化时序数据库说明
 
       数据存储在内存中以key+value的方式存在，key为股票代码，前两位为市场号，后面为不定长的股票代码；
       value为一个数据集合，包括说有数据表；
       系统会以hash算法进行key的检索，时间复杂度为1；
-
-   > type:
-
-      1、sts  : struct time serial  结构化时序数据表，为主要的行情数据存储结构； 默认值
-
-      2、json  :  该表为json格式数据，只能按json格式读取，通常一个key一条数据，类似key-value的字典
-                  支持节点查询
-
-      ---------------------------------------------------------
-
-      非json的数据表一般具备时间字段，时间字段为保留关键字time，并处于第一位，如果传入数据没有该字段，就用服务器的当前时间；
-
-      time字段的格式定义有以下四种: 
-   > format: 
-         1、incr   :  递增序列号 从1开始按自然数递增 默认尺度为incr
-         2、date   :  按日期  -- 20180303 默认尺度为day
-         3、second :  按秒    -- time_t 格式存储数据 默认尺度为sec
-         4、msec   :  按毫秒  -- mtime_t 64位时间格式 默认尺度为msec
-         
-         5、none   :  该表没有时间字段 scale为none 依然是结构化数据
-
-                     
 
       time字段的时间尺度定义有以下几种: 
       时间尺度的定义是保证同一个时间尺度的数据只能覆盖合并，而不能生成新的记录；
@@ -368,17 +347,18 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
       需要和format结合起来使用，sclae 的作用是客户端无需了解数据库中数据情况如何，直接把最新数据上传，由服务器来合并数据
       简化客户端的工作量；
    > scale: 
-         0  : incr  : 递增序列号
-         1  : msec  : 毫秒  -- msec
-         5  : second : 秒    -- secs 
-         10 : min1  : 1分钟 -- secs
-         11 : min5  : 5分钟 -- secs
-         15 : hour  : 小时  -- secs
-         20 : date   : 天 -- date
-         21 : week  : 周 -- date
-         25 : month : 月 -- date
-         30 : year  : 年 -- date
-   > insert-check: 
+         0  : none  : 默认
+         1  : incr  : 递增序列号
+         2  : msec  : 毫秒  -- msec
+         3  : second : 秒    -- secs 
+         4  : min1  : 1分钟 -- secs
+         5  : min5  : 5分钟 -- secs
+         6  : hour  : 小时  -- secs
+         7  : date   : 天 -- date
+         8  : week  : 周 -- date
+         9  : month : 月 -- date
+         10 : year  : 年 -- date
+   > append-method: 
       生成新记录时需要检查的字段；
 
    > limit:
@@ -398,12 +378,16 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
       7、price   价格 --放大倍数参考基准单位 (暂时不用)
       8、volume  数量 --缩放倍数参考基准单位 (暂时不用)
 
+      9、 date   日期  -- 20180303 默认尺度为day
+      10、second 秒    -- time_t 格式存储数据 默认尺度为sec
+      11、msec   毫秒  -- mtime_t 64位时间格式 默认尺度为msec
+
    > isinit:
       false :  不做初始化；
       true  :  在工作开始时间，进入等待初始化状态，
                当有任何一个SH开头股票的信息传入数据库，那么所有SH开头的代码，对应的等待初始化状态的数据表将会清空数据；
 
-   > publish:
+   > publishs:
       当收到本表数据数据并处理后，需要向其他哪些表发布数据，
       这里约定为只能向scale更大的表（小的时间尺度向大的时间尺度）发送数据，否则丢弃；
 
@@ -468,5 +452,5 @@ sisdb是一个开源的使用ANSI C语言编写、支持网络、基于内存并
 
    先以股票交易所为主，未来期货交易所、外汇市场、虚拟货币交易所另行定义标志符；
 
-   市场编码并不一定是两位字符，也可以是更多位，因此判断市场并不要直接截取关键字的前两位，而是应该通过数据库中唯一的key值，查询其stock中的market来判定市场归属；
+   市场编码并不一定是两位字符，也可以是更多位，因此判断市场并不要直接截取关键字的前两位，而是应该通过数据库中唯一的key值，查询其sisdb中的market来判定市场归属；
    
